@@ -28,7 +28,11 @@ const db = mysql.createConnection(
 
 // returns all data in the candidates table
 app.get('/api/candidates', (req, res) => {
-    const sql = `SELECT * FROM candidates`;
+    const sql = `SELECT candidates.*, parties.name
+                 AS party_name
+                 FROM candidates
+                 LEFT JOIN parties
+                 ON candidates.party_id = parties.id`;
 
     db.query(sql, (err, rows) => {
         if (err) {
@@ -44,7 +48,12 @@ app.get('/api/candidates', (req, res) => {
 
 // GET a single candidate
 app.get('/api/candidate/:id', (req, res) => {
-    const sql = `SELECT * FROM candidates WHERE id = ?`;
+    const sql = `SELECT candidates.*, parties.name
+                 AS party_name
+                 FROM candidates
+                 LEFT JOIN parties
+                 ON candidates.party_id = parties.id
+                 WHERE candidates.id = ?`;
     const params = [req.params.id]; 
 
     db.query(sql, params, (err, row) => {
@@ -115,7 +124,3 @@ app.use((req, res) => {
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 })
-
-// I am trying to write the 'mysql.createConnection' expression in the module 12.2.3, and I am using a process.env for my password so that I don't need to upload my mysql password to github, however whenever I try to do 'npm start' now, it is showing an error and kicks me out of the server. I checked and my password seems to be stored correctly in the process.env variable.
-
-// Thank you
